@@ -1,0 +1,249 @@
+.login{
+    width: 40%;
+    margin: auto;
+    margin-top: 4%;
+    padding-top: 20%;
+}
+
+.loginInput{
+    width: 40%;
+    background: green;
+}
+
+.MainApp {
+    width: 100%;
+}
+
+.App {
+    text-align: center;
+    height: 100%;
+    min-height: 100vh;
+    background-color: #7c6c68;
+}
+
+.LoginComponent {
+    background: url("./assets/background.jpg") no-repeat center center;
+    background-size: cover;
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 5vw;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    color: #fff;
+}
+
+.LoginComponent .Description {
+    text-align: initial;
+    color: white;
+    font-family: poppins;
+    width: 500px;
+    justify-self: right;
+    z-index: 1;
+}
+
+.LoginComponent::after {
+    background: rgb(31 32 33 / 88%);
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    color: #fff;
+    z-index: 0;
+}
+
+.login {
+    width: 27em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 99;
+}
+
+.register{
+    /* padding-top: 2%; */
+    width: 27em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 99;
+    /* margin-top: 4%; */
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0px 0px 12px 2px rgba(15, 15, 15, 0.2);
+    border-radius: 4px;
+    position: relative;
+    z-index: 99;
+    width: 100%;
+    height: auto;
+    z-index: 99;
+    padding: 17px 10px;
+    transition: transform 200ms ease-in-out;
+}
+
+.base-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0px 0px 12px 2px rgba(15, 15, 15, 0.2);
+    border-radius: 4px;
+    position: relative;
+    z-index: 99;
+    width: 100%;
+    height: auto;
+    z-index: 99;
+    padding: 17px 10px;
+}
+
+.content {
+    width: 100%;
+    padding: 0 2em;
+    text-align: initial;
+}
+
+.content .form-group input {
+    margin-top: 6px;
+    width: 100%;
+    height: 50px;
+    padding: 0px 15px;
+    font-size: 16px;
+    background-color: #f3f3f3;
+    border: 1px solid #007BFF;
+    border-radius: 10px;
+    margin-bottom: 0px;
+    transition: all 250ms ease-in-out;
+}
+
+.content .form-group label {
+    font-size: 15px;
+    padding: 0px 0px 0px 5px;
+    color: black;
+    font-weight: 500;
+}
+
+.content .footerBtn {
+    display: flex;
+    justify-content: space-around;
+    justify-items: center;
+}
+
+.content .footerBtn .btn {
+    padding: .6em 2.5em;
+}
+
+.loginLink{
+    text-align: center;
+}
+
+img{
+    width: 20px;
+    height: 20px;
+}
+
+.image-post{
+    width: 100%;
+    height: 100%;
+}
+
+.nav-link{
+    font-size: medium;
+    color: bisque;
+}
+
+.inp{
+    background-color: gr;
+}
+
+.post{
+    margin: 5px;
+    background: darkslategray;
+    padding: 2%;
+    margin: 10px 20px 25px 20px;
+}
+
+.post h2{
+    color: grey;
+}
+.gg{
+    font-size: xx-large;
+    font-weight: 400;
+}
+
+.cont{
+    font-weight: 500;
+    text-align: left;
+    padding: .5%;
+    background: #cd9999;
+    /* width: 80%; */
+}
+
+.inf{
+    font-size: large;
+    color: blueviolet;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 13px;
+}
+
+.lino{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+sub{
+    color: beige;
+    font-size: small;
+}
+
+.lin{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.logout{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* z-index: 9; */
+        /* margin: 20px;  */
+}
+
+.cmt-avatar {
+    background: lightgray;
+    width: 45px;
+    height: 45px;
+    border-radius: 100%;
+    float: left;
+    margin-right: 1em;
+    overflow: hidden;
+}
+.cmt-avatar img{
+    width: 100%;
+    height: 100%;
+}  

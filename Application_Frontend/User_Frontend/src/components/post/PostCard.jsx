@@ -1,0 +1,206 @@
+import React, { Component } from 'react'
+import { ReactComponent as Close } from './assets/times.svg';
+import { ReactComponent as Edit } from './assets/edit.svg';
+import AuthenticationService from './AuthenticationService';
+import PostDataService from '../../api/main/PostDataService';
+import Editable from './Editable';
+import moment from 'moment';
+import Avatar from './Avatar';
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
+import LikeButton from "../profilewall/assets/likebutton.ico";
+import Toast from 'react-bootstrap/Toast';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+// import ToastContainer from 'react-bootstrap/ToastContainer';
+let stompClient = null;
+export default class PostCard extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            target: this.props.username,
+            show: false,
+            comments: [],
+            content: '',
+            like: 0,
+            toastShow: false,
+            confirmModel: false,
+            afterDone: false
+        }
+    }
+
+    toggleShow = (event) => {
+        this.setShow(!this.state.show);
+    }
+    
+    setShow = (value) => {
+        this.setState({
+            show: value
+        })
+    }
+
+    componentDidMount() {
+        this.setState({comments: this.props.post.comments, like: this.props.post.likes.length}, this.scrollToBottom());
+        this.refreshComments();
+    }
+
+    refreshComments = () => {
+        PostDataService.retrievePostComments(this.state.target, this.props.post.id).then(res => {
+            this.setState({comments: res.data});
+            this.scrollToBottom();
+        });
+    }
+
+    handleChange = (event) => {
+        this.setState({
+            content: event.target.value
+        })
+    }
+
+    handleComment = () => {
+        let username = AuthenticationService.getLoggedInUserName()
+
+        let comment = {
+            username: username,
+            description: this.state.content,
+            targetDate: moment(new Date()).format()
+        }
+
+        PostDataService.postComment(this.state.target, this.props.post.id, comment).then((res, err) => {
+            if(err) {
+                console.error("err comment", err);
+            }
+            this.refreshComments();
+            this.props.stompClient.send("/app/postStatus", {}, true);
+        });
+        this.setState({content: ''});
+    }
+
+    handleLike =()=>{
+        let username = AuthenticationService.getLoggedInUserName();
+        let body={
+            idOfPost: this.props.post.id,
+            liker: username
+        }
+        PostDataService.likePost(body)
+            .then((response)=>{
+                (response.data==="Like Added") ? this.setState({like: parseInt(this.state.like) + 1})
+                : this.handleUnLike();
+        });
+    }
+
+    handleReportWarning=()=>{
+        this.setState({confirmModel: true});
+    }
+
+    handleReport=()=>{
+        let username = AuthenticationService.getLoggedInUserName();
+        let body={
+            idOfPost: this.props.post.id,
+            reporter: username
+        }
+        PostDataService.reportPost(body)
+            .then((response)=>{
+                if(response.data=="Already reported"){
+                    this.setState({toastShow: true, confirmModel: false});
+                }else{
+                    this.setState({afterDone: true, confirmModel: false});
+                }
+            })
+    }
+
+    handleUnLike=()=>{
+        let username = AuthenticationService.getLoggedInUserName();
+        let body={
+            idOfPost: this.props.post.id,
+            liker: username
+        }
+        PostDataService.unLikePost(body)
+            .then((response)=>
+                this.setState({like: parseInt(this.state.like) - 1})
+        );
+    }
+
+    scrollToBottom = () => {
+        var object = this.refs.comments;
+        if (object)
+          object.scrollTop = object.scrollHeight;
+    }
+
+    render() {
+        return (   
+        <div className="ui-block ui-custom" key={this.props.post.id}>
+
+            <div className="toast-container">
+                <Toast className="report-toast" onClose={() => this.setState({toastShow: false})} show={this.state.toastShow} delay={3000} autohide>
+                        <Toast.Header bg='primary'>
+                            <img
+                            src="holder.js/20x20?text=%20"
+                            className="rounded me-2"
+                            alt=""
+                            />
+                            <strong className="me-auto">You already reported this post!!</strong>
+                            {/* <small>You a</small> */}
+                        </Toast.Header>
+                    <Toast.Body bg='primary'>Our team will check & will remove it if found inappropriate.</Toast.Body>
+                </Toast>
+            </div>
+            <Modal backdrop="static"  show={this.state.confirmModel} onHide={()=>this.setState({confirmModel: false})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Alert!!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to report this post!!. This action can't be undone!!</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={()=>this.setState({confirmModel: false})}>
+                    No, go back!
+                </Button>
+                <Button variant="primary" onClick={()=>this.handleReport()}>
+                    Yes, go ahead!
+                </Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal show={this.state.afterDone} onHide={()=>this.setState({afterDone: false})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Thanks!!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>You've reported post for not following our Community Standards. We'll remove it if found offensive, spam or misleading.</Modal.Body>
+            </Modal>
+
+            <div className="status-head">
+                <div className="status-left">
+                    <Avatar username={this.props.username}/>
+                    <div style={{float: 'left'}}>
+                        <a href={'/profile/' + this.props.username}>{this.props.username}</a>
+                        <div className="date">{moment(this.props.post.targetDate).fromNow()}</div>
+                    </div>
+                </div>
+                {this.props.username == AuthenticationService.getLoggedInUserName() ? <div className="status-right">
+                    {((!this.props.post.postImage) && <OverlayTrigger placement={"bottom"} overlay={<Tooltip id={"tooltip-bottom"}>Edit this post</Tooltip>}><Edit onClick={this.toggleShow}/></OverlayTrigger>)}
+                    <OverlayTrigger placement={"bottom"} overlay={<Tooltip id={"tooltip-bottom"}>Delete this post</Tooltip>}><Close name="delete" onClick={() => this.props.deletePostClicked(this.props.post.id)}/></OverlayTrigger>
+                </div> :""}
+            </div>
+            <div className="status-content">
+                {!this.state.show && 
+                    (this.props.post.description != null) ? this.props.post.description 
+                        : <img className="image-post" src={this.props.post.postImage}/>
+                }
+                {this.state.show && <Editable post={this.props.post} toggleShow={this.toggleShow} username={this.props.username} refreshFeed={this.props.refreshFeed} content={this.props.post.description} stompClient={this.props.stompClient}></Editable>}
+            </div>
+            <div className="like-block" onClick={()=>this.handleLike()}><img className='like-icon' src={LikeButton}/>{(this.state.like===0) ? "" : this.state.like}</div>
+            <div className="comments">
+                <div className="commentHolder" ref="comments">
+                    {this.state.comments.map((comment, i) => <div className="comment" key={i}><Avatar username={comment.username}/><div className="commenter"><a href={'/profile/' + comment.username}>{comment.username}</a></div> <div className="comment-desc">{comment.description}</div></div>)}
+                </div>
+
+                <div className="comment-control form-row">
+                    <input type="text" className="col-md-9 col-sm-9 col-xs-9" onChange={this.handleChange} value={this.state.content} placeholder="Write a comment.." onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                        this.handleComment();
+                    }
+                }}></input>
+                    <button className="btn btn-primary btn-status col-md-2 col-sm-2 col-xs-2" onClick={this.handleComment}>Comment</button>
+                </div>
+            </div>
+        </div>);
+    }
+}
